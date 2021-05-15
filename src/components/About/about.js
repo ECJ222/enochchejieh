@@ -15,7 +15,7 @@ const About = () => {
             }}
           />
           <p>
-            I&apos;m a software developer and technical writter based in Nigeria
+            I&apos;m a software developer and technical writer based in Nigeria
             with a love for open source and exploring new things.
           </p>
           <em>„Faber est Suae Quisque Fortunae“</em>
