@@ -1,9 +1,13 @@
 import React from 'react'
+import { Link } from 'gatsby'
 
 const Writing = () => {
   return (
     <div id="writing">
-      <h3>Writing</h3>
+      <h3>Most Recent Articles</h3>
+      <Link to="/writing" className="link">
+        See all
+      </Link>
       <div className="writing-container">
         <a
           href="https://medium.com/nerd-for-tech/a-beginners-guide-to-setting-up-ci-cd-with-github-actions-81554e7847d0"

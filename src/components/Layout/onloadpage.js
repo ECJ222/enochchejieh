@@ -1,15 +1,25 @@
-import React from 'react'
+/* eslint-disable react/prop-types */
+import React, { useEffect } from 'react'
 import Logo from '../../images/logo.svg'
+import { connect } from 'react-redux'
+import { togglePageLoaded } from '../../state/app'
 
-const OnLoadPage = () => {
-  const [pageRendered, setPageRendered] = React.useState(false)
+const OnLoadPage = ({ pageLoaded, dispatch }) => {
+  const [pageRendered, setPageRendered] = React.useState(true)
 
-  setTimeout(() => {
-    setPageRendered(true)
-  }, 7000)
+  useEffect(() => {
+    if (!pageLoaded) {
+      setTimeout(() => {
+        setPageRendered(false)
+        dispatch(togglePageLoaded(true))
+      }, 3000)
+    } else {
+      setPageRendered(false)
+    }
+  }, [])
 
   return (
-    <div className={!pageRendered ? 'load-container' : 'load-container hidden'}>
+    <div className={pageRendered ? 'load-container' : 'load-container hidden'}>
       <div className="content">
         <div className="loader-line-mask">
           <div className="loader-line"></div>
@@ -20,4 +30,8 @@ const OnLoadPage = () => {
   )
 }
 
-export default OnLoadPage
+const mapStateToProps = state => ({
+  pageLoaded: state.app.pageLoaded
+})
+
+export default connect(mapStateToProps)(OnLoadPage)
