@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Link, navigate } from 'gatsby'
 import ScreenWidth from '../Utils/ScreenWidth'
 
@@ -8,11 +8,11 @@ const Desktopheader = () => {
   const [menuOpen, setMenuOpen] = React.useState(false)
   const { width } = ScreenWidth()
 
-  useEffect(() => {
-    if (width > 900) {
-      setMenuOpen(false)
-    }
-  }, [width])
+  // useEffect(() => {
+  //   if (width > 900) {
+  //     setMenuOpen(false)
+  //   }
+  // })
 
   const home = () => {
     navigate('/')
@@ -33,10 +33,10 @@ const Desktopheader = () => {
   return (
     <header className="nav-header">
       <img className="logo" src={Logo} alt="icon" onClick={home} />
-      <nav className={menuOpen ? 'mobile-nav-open' : ''}>
+      <nav className={width <= 900 && menuOpen ? 'mobile-nav-open' : ''}>
         <div
           id="hamburger"
-          className={menuOpen ? 'open' : ''}
+          className={width <= 900 && menuOpen ? 'open' : ''}
           onClick={openMenu}
         >
           <span></span>
@@ -54,17 +54,6 @@ const Desktopheader = () => {
           onClick={openMenu}
         >
           ABOUT
-        </Link>
-        <Link
-          to="/#projects"
-          className={
-            width <= 900 && menuOpen
-              ? 'animate__animated animate__fadeInDownBig'
-              : ''
-          }
-          onClick={openMenu}
-        >
-          CRAFTS
         </Link>
         <Link
           to="/#writing"
