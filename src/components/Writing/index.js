@@ -32,8 +32,8 @@ const Writing = () => {
             Test-Driven Development in React with React Testing Library and Jest
           </h4>
           <span>
-            I wrote an article explaining on test driven development in react
-            using react testing library and jest.
+            I wrote an article on test driven development in react using react
+            testing library and jest.
           </span>
         </a>
       </div>

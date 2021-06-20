@@ -27,8 +27,20 @@ const Articles = () => {
             Test-Driven Development in React with React Testing Library and Jest
           </h4>
           <span>
-            I wrote an article explaining on test driven development in react
-            using react testing library and jest.
+            I wrote an article on test driven development in react using react
+            testing library and jest.
+          </span>
+        </a>
+        <a
+          href="https://medium.com/nerd-for-tech/how-to-optimize-your-productivity-as-a-software-developer-3399cdb870c9"
+          className="writing"
+          data-sal="slide-up"
+          data-sal-duration="500"
+        >
+          <h4>How to Optimize Your Productivity as a Software Developer</h4>
+          <span>
+            I wrote an article explaining how to optimize your productivity as a
+            Software Developer.
           </span>
         </a>
       </div>

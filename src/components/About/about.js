@@ -23,9 +23,11 @@ const About = () => {
             <li>Html</li>
             <li>Css</li>
             <li>Javascript</li>
-            <li>React Js</li>
-            <li>Vue Js</li>
-            <li>Node / Express Js</li>
+            <li>ReactJs</li>
+            <li>Redux</li>
+            <li>VueJs</li>
+            <li>NuxtJs</li>
+            <li>Node / ExpressJs</li>
             <li>Python</li>
           </ul>
         </div>
