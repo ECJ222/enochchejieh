@@ -1,18 +1,22 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, navigate } from 'gatsby'
 import ScreenWidth from '../Utils/ScreenWidth'
 
 import Logo from '../../images/logo.svg'
 
 const Desktopheader = () => {
-  const [menuOpen, setMenuOpen] = React.useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
   const { width } = ScreenWidth()
 
-  // useEffect(() => {
-  //   if (width > 900) {
-  //     setMenuOpen(false)
-  //   }
-  // })
+  useEffect(() => {
+    if (width > 900) {
+      setMenuOpen(false)
+    }
+
+    return () => {
+      setMenuOpen(false)
+    }
+  }, [])
 
   const home = () => {
     navigate('/')

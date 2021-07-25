@@ -37,7 +37,7 @@ const Writing = () => {
 
   return (
     <div id="writing">
-      <h3>Most Recent Articles</h3>
+      <h3>Articles</h3>
       <Link to="/writing" className="link">
         See all
       </Link>

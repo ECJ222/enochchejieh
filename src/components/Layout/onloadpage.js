@@ -1,11 +1,11 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import Logo from '../../images/logo.svg'
 import { connect } from 'react-redux'
 import { togglePageLoaded } from '../../state/app'
 
 const OnLoadPage = ({ pageLoaded, dispatch }) => {
-  const [pageRendered, setPageRendered] = React.useState(true)
+  const [pageRendered, setPageRendered] = useState(true)
 
   useEffect(() => {
     if (!pageLoaded) {
@@ -15,6 +15,10 @@ const OnLoadPage = ({ pageLoaded, dispatch }) => {
       }, 3000)
     } else {
       setPageRendered(false)
+    }
+
+    return () => {
+      setPageRendered(true)
     }
   }, [])
 
