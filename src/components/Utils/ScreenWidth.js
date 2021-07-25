@@ -8,10 +8,10 @@ const ScreenWidth = () => {
   })
 
   React.useEffect(() => {
-    window.addEventListener('resize', Screen)
+    window.addEventListener('resize', () => Screen)
 
     return () => {
-      window.addEventListener('resize', Screen)
+      window.addEventListener('resize', () => Screen)
     }
   }, [])
 

@@ -12,10 +12,6 @@ const Desktopheader = () => {
     if (width > 900) {
       setMenuOpen(false)
     }
-
-    return () => {
-      setMenuOpen(false)
-    }
   }, [])
 
   const home = () => {

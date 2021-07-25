@@ -32,7 +32,7 @@
 #writing .link {
   margin: 2rem 0 0 auto;
   font-weight: 400;
-  font-size: 0.5rem;
+  font-size: 0.7rem;
   position: relative;
   color: #000;
   text-decoration: none;
@@ -48,11 +48,11 @@
   padding: 0.3rem 1rem;
 
   @media (min-width: 400px) {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
   }
 
   @media (min-width: 1400px) {
-    font-size: 1rem;
+    font-size: 1.1rem;
   }
 }
 
