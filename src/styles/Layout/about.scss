@@ -23,23 +23,23 @@
 
 #about .Typewriter__wrapper,
 #about .Typewriter__cursor {
-  font-size: 1.8rem;
+  font-size: 1.1rem;
 
   @media (min-width: 400px) {
-    font-size: calc(1.7rem + 1.5vw);
+    font-size: 1.4rem;
   }
 
   @media (min-width: 1400px) {
-    font-size: 48px;
+    font-size: 2.2rem;
   }
 }
 
 #about p {
-  font-size: 1rem;
+  font-size: 0.8rem;
   margin-top: 1rem;
 
   @media (min-width: 400px) {
-    font-size: calc(1.1rem + 1.5vw);
+    font-size: 1rem;
   }
 
   @media (max-width: 1024px) {
@@ -47,16 +47,16 @@
   }
 
   @media (min-width: 1400px) {
-    font-size: 25px;
+    font-size: 1.25rem;
   }
 }
 
 #about em {
-  font-size: 1.5rem;
+  font-size: 1rem;
   margin-top: 1rem;
 
   @media (min-width: 400px) {
-    font-size: calc(1.5rem + 1.5vw);
+    font-size: 1.1rem;
   }
 
   @media (max-width: 1024px) {
@@ -64,7 +64,7 @@
   }
 
   @media (min-width: 1400px) {
-    font-size: 35px;
+    font-size: 1.5rem;
   }
 }
 
@@ -80,7 +80,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: calc(0.5625rem + 0.5vw);
+    font-size: 0.75rem;
     height: 40px;
     background: #000000;
     color: #fff;
@@ -89,7 +89,7 @@
     padding: 0px 0.5rem 0px 0.5rem;
 
     @media (min-width: 1400px) {
-      font-size: 20;
+      font-size: 0.8rem;
     }
   }
 

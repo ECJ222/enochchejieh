@@ -22,11 +22,18 @@ module.exports = {
       }
     },
     {
+      resolve: 'gatsby-source-filesystem',
+      options: {
+        name: 'posts',
+        path: `${__dirname}/src/content/posts`
+      }
+    },
+    {
       resolve: 'gatsby-transformer-cloudinary',
       options: {
-        cloudName: process.env.CLOUDINARY_CLOUD_NAME,
-        apiKey: process.env.CLOUDINARY_API_KEY,
-        apiSecret: process.env.CLOUDINARY_API_SECRET
+        cloudName: 'dn9u4rxqg', // process.env.CLOUDINARY_CLOUD_NAME,
+        apiKey: '527522542664417', // process.env.CLOUDINARY_API_KEY,
+        apiSecret: 'zIP_9g9o9mZj_3_9XB5M9InFpYI' // process.env.CLOUDINARY_API_SECRET
       }
     },
     {
@@ -38,9 +45,9 @@ module.exports = {
     {
       resolve: 'gatsby-source-cloudinary',
       options: {
-        cloudName: process.env.CLOUDINARY_CLOUD_NAME,
-        apiKey: process.env.CLOUDINARY_API_KEY,
-        apiSecret: process.env.CLOUDINARY_API_SECRET,
+        cloudName: 'dn9u4rxqg', // process.env.CLOUDINARY_CLOUD_NAME,
+        apiKey: '527522542664417', // process.env.CLOUDINARY_API_KEY,
+        apiSecret: 'zIP_9g9o9mZj_3_9XB5M9InFpYI', // process.env.CLOUDINARY_API_SECRET,
         resourceType: 'image',
         prefix: 'images/'
       }
@@ -52,11 +59,20 @@ module.exports = {
         short_name: 'GatsbyJS',
         start_url: '/',
         background_color: '#000000',
-        theme_color: '#00000',
+        theme_color: '#000000',
         display: 'standalone',
         icon: 'src/images/E.png'
       }
     },
+    {
+      resolve: 'gatsby-plugin-mdx',
+      options: {
+        defaultLayouts: {
+          posts: require.resolve('./src/components/layout/postlayout.js')
+        }
+      }
+    },
+    'gatsby-remark-reading-time',
     'gatsby-plugin-sass'
   ]
 }
