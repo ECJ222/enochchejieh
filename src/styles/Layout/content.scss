@@ -43,6 +43,10 @@
     li {
       margin-bottom: 0.8rem;
 
+      p {
+        display: inline;
+      }
+
       &:last-child {
         margin-bottom: 0.3rem;
       }

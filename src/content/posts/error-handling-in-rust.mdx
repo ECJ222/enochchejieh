@@ -1,0 +1,145 @@
+---
+slug: "/error-handling-in-rust"
+date: "2021-10-24"
+title: "Error Handling in Rust"
+description: I wrote an article about error handling in rust.
+---
+
+## Introduction
+
+In this article, we're going to take a look at Error handling in Rust and how it improves the performance of Rust web applications.
+
+Error handling is an important part of software development because it improves the way we think about software as we build and it allows us to intercept errors/failures.
+
+When we build software, we tend to run into bugs or errors in our code and when we do, we are greeted with great error messages which help us identify problems efficiently. This, in turn, boosts our productivity and can lead to a better developer experience.
+
+## Major Difference between Error Handling in Rust and Other Programming Languages
+
+Compared to other programming languages that handle errors by throwing exceptions, Rust handles errors by returning actual errors. While throwing exceptions is very useful for the identification of error types and error reporting, it's not very explicit, which means it would be easy to miss areas of code that should have exception handling. Rust, on the other hand, returns errors explicitly.
+
+## How Rust Handles Errors
+
+Result Type
+The result type `Result<T, E>` is an enum that has two possible states:
+
+```
+enum Result<T, E> {
+    Ok(T),
+    Err(E)
+}
+```
+
+`T` can be any type and `E` can be any error. The two states `Ok(T)` represent success and holds a value, and `Err(E)` represent error and holds a specific error value.
+
+We use the result type when operations might go wrong. An operation is expected to succeed, but there might be cases where it fails.
+
+For example:
+
+```
+use std::num::ParseIntError;
+
+fn convert_string_to_integer(number_str: &str) -> Result<(), ParseIntError> {
+    let number:i32 = match number_str.parse() {
+        Ok(number) => number,
+        Err(e) => return Err(e)
+    };
+
+    println!("{}", number); // 200
+
+    Ok(())
+}
+```
+
+Here's what happens:
+
+- When `convert_string_to_integer` is called, this function converts a string to an integer value based on the string parameter passed in the function.
+
+- With the match number_str.parse() we are required to handle the two possible states. When we pass a string containing only numbers, the operation succeeds then we assign the converted value to the number variable, or we return from the function by returning the error when the operation fails.
+
+## Panic
+
+In Rust, When you encounter an unrecoverable error they can be handled by panic!. panic! allows you to stop your program in execution when you encounter this kind of error and also provides useful feedback.
+
+Here's an example:
+
+```
+use std::num::ParseIntError;
+
+fn convert_string_to_integer(number_str: &str) -> Result<(), ParseIntEror> {
+    let number:i32 = match number_str.parse() {
+        Ok(number) => number,
+        Err(_) => panic!("Invalid digit found in string")
+    };
+
+    println!("{}", number); // 200
+
+    Ok(())
+}
+```
+
+When we encounter an error in this function `panic!('Invalid digit found in string')` will be invoked.
+
+## Unwrap
+
+There might be some situations that you are very confident about the code you have written and you feel positive that your code won't encounter errors and you want to opt-out of error handling.
+
+In that case you can simply use the `unwrap()` method, for example:
+
+```
+fn convert_string_to_integer() -> i32 {
+    let number_str:&str = "200";
+    let number:i32 = number_str.parse().unwrap();
+
+    return number; 
+}
+
+let result = convert_string_to_integer();
+println!("{}", result); // 200
+```
+
+## Expect
+
+The `expect()` method is similar to the `unwrap()` but unlike `unwrap()`, The `expect()` method allows you to set an error message. This makes debugging a lot easier.
+
+```
+fn convert_string_to_integer(number_str: &str) {
+    let number_str:&str = "o100" 
+    let number:i32 = number_str.parse();
+
+    number.expect("Invalid digit in string");
+}
+```
+
+The output
+
+```
+thread 'main' panicked at 'Invalid digit in string: ParseIntError { kind: InvalidDigit }', src/main.rs:11:20
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+```
+
+The Question Mark Operator (?)
+
+The (?) operator makes the propagation of errors much easier and it's equivalent to the match expression. It eliminates a lot of verbosities when implementing functions and it can only be applied for `Result<T, E>` and `Option<T>` types, unlike the match expression, it unpacks the Result if Ok and returns the error if it's not.
+
+For example:
+
+```
+use std::num::ParseIntError;
+
+fn convert_string_to_integer(number_str: &str) -> Result<i32, ParseIntError>  {
+    let number:i32 = number_str.parse()?;
+
+    Ok(number)
+}
+
+let result = convert_string_to_integer("200");
+println!("{:?}", result); // Ok(200)
+```
+
+Notice how our code looks much more simpler and easier to read.
+
+## Conclusion
+
+Error handling is about good communication. Rust has made a strong emphasis on making error handling a good experience for developers.
+
+There is of course more methods used in Rust for error handling, but the ones covered in this article should get you started, this is also my first technical rust article and I look forward to writing more, please if you have any questions or comments please feel free to ask them in the comment section.

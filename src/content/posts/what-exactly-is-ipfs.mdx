@@ -1,0 +1,32 @@
+---
+slug: "/what-exactly-is-ipfs"
+date: "2021-11-12"
+title: "What exactly is IPFS?"
+description: I wrote an article about IPFS.
+---
+
+InterPlanetary File System (IPFS) is a term used to describe a peer-to-peer (p2p) distributed file-sharing system for storing and accessing data.
+
+IPFS is one of a few projects that are part of the Protocol Labs Organization, which was also founded by Benet. Inter-Planetary Linked Data (IPLD) and Filecoin are two Protocol Labs projects that are closely related to IPFS. The IPLD data model is a data model for distributed data structures such as blockchains. This model makes it simple to store and access blockchain data via IPFS. Users who store data on IPFS will be rewarded with Filecoin.
+
+## How does IPFS work?
+
+Let's imagine you just uploaded some content to IPFS. That content will then be split up into small pieces of data, the data is then given a certain unique fingerprint called a cryptographic hash.
+
+When multiple people upload the same content to IPFS, it will only be created once and that makes the network very efficient.
+
+Also when you need to look up content to view or download on IPFS you don't need to remember the hash assigned to that content, every content on IPFS can be found using Inter-Planetary Naming System (IPNS), a human-readable decentralized naming system for IPFS.
+
+## Why use IPFS?
+
+The internet as it is today is built on technologies like Hypertext Transfer Protocol (HTTP), Domain Name System (DNS), and the way it works is by looking up IP addresses and forwarding the content from the IP address, This is called location-based addressing.
+
+When a user searches for a website, let's say [amazon.com](http://amazon.com/) for instance the user is trusting that whatever is located at that server to be the content that they want and that could be a problem because theirs nothing stopping the content from changing without the user doing anything about it.
+
+Another problem is that when there's only one source of content it creates constriction and centralization. On the contrary, IPFS uses content-based addressing. So when a user is requesting a piece of data it retrieves the content and not the location of that content which is more efficient. This really makes the web a lot more robust and protected.
+
+## Conclusion
+
+Software developers are currently moving to decentralized data networks as a way to build new models around data ownership and to develop a better internet.
+
+This article is just an introduction to IPFS, there's still a lot to know about this wonderful technology. If you want to know more you can check out their [website](https://ipfs.io/).
