@@ -1,0 +1,303 @@
+---
+slug: "/build-a-universal-vue-component-library-with-vue-demi"
+date: "2021-01-04"
+title: "Build a universal Vue component library with Vue Demi"
+description: I wrote an article explaining how to build a component library with Vue Demi.
+---
+
+According to creator Anthony Fu, [Vue Demi](https://github.com/vueuse/vue-demi?ref=madewithvuejs.com) is a developing utility that allows users to write universal Vue libraries for Vue 2 and Vue 3, without worrying about user-installed versions.
+
+Previously, to create [Vue libraries](https://blog.logrocket.com/building-vue-3-component-library/) that support both targeted versions, we would use different branches to separate the support for each version. This is a good approach for existing libraries, as their codebases are usually more stable.
+
+The downside is that you need to maintain two codebases, which doubles the workload. For new Vue libraries that want to support both targeted versions of Vue, I wouldn’t recommend this approach. Implementing feature requests and bug fixes twice is simply not ideal.
+
+This is where Vue Demi comes in. Vue Demi solves this problem by providing universal support for both targeted versions, meaning you only have to build once with all the benefits of both targeted versions, getting the best of both worlds.
+
+In this article, we’ll look at what Vue Demi does, how it works, and how to get started by building a universal Vue component library.
+
+## Extra APIs in Vue demi
+
+In addition to the APIs Vue already provides, Vue Demi introduces a few extra to assist in distinguishing the user’s environment and performing version-specific logic. Let’s take a closer look at them!
+
+> Note that Vue Demi also includes standard APIs that are already present in Vue, such as ref, onMounted, and onUnmounted, among others.
+
+## `isVue2` and `isVue3`
+
+In Vue Demi, the `isvue2` and `isvue3` APIs allow users to apply version-specific logic when creating Vue libraries.
+
+For example:
+
+```javascript
+import { isVue2, isVue3 } from 'vue-demi' 
+
+if (isVue2) { 
+  // Vue 2 only 
+} else { 
+  // Vue 3 only 
+}
+```
+
+## `vue2`
+
+Vue Demi provides the `vue2` API, which allows users to access the global API of Vue 2 like so:
+
+```javascript
+import { Vue2 } from 'vue-demi' 
+// in Vue 3 `Vue2` will return undefined 
+if (Vue2) { 
+  Vue2.config.devtools = true 
+}
+```
+
+## `install()`
+
+In Vue 2, the Composition API is provided as a plugin that needs to be installed on the Vue instance before using it:
+
+```javascript
+import Vue from 'vue' 
+import VueCompositionAPI from '@vue/composition-api' 
+
+Vue.use(VueCompositionAPI)
+```
+
+Vue Demi tries to install it automatically, but for cases in which you want to make sure the plugin is installed correctly, the `install()` API is provided to help you.
+
+It is exposed as a safe version of `Vue.use(VueCompositionAPI)`:
+
+```javascript
+import { install } from 'vue-demi' 
+
+install()
+```
+
+## Getting started with Vue Demi
+
+To get started with Vue Demi, you’ll need to install it into your application. For this article, we’ll be creating a Vue component library that integrates the Paystack payment gateway.
+
+You can install Vue Demi like so:
+
+```javascript
+// Npm 
+npm i vue-demi 
+
+// Yarn 
+yarn add vue-demi
+```
+
+You’ll also need to add `vue` and `@vue/composition-api` as your library’s peer dependencies to specify the version it should support.
+
+Now we can import Vue Demi into our application:
+
+```typescript
+<script lang="ts"> 
+import {defineComponent, PropType, h, isVue2} from "vue-demi" 
+
+export default defineComponent({
+  // ... 
+}) 
+</script>
+```
+
+As seen here, we can use standard Vue APIs already present, such as `defineComponent`, `PropType`, and `h`.
+
+Now that we have imported Vue Demi, let’s add our props. These are the properties the user will be required (or not, depending on your taste) to pass in to use the component library:
+
+```typescript
+<script lang="ts">
+import {defineComponent, PropType, h, isVue2} from "vue-demi"
+// Basically this tells the metadata prop what kind of data is should accept
+interface MetaData {
+  [key: string]: any
+}
+
+export default defineComponent({
+  props: {
+    paystackKey: {
+      type: String as PropType<string>,
+      required: true,
+    },
+    email: {
+      type: String as PropType<string>,
+      required: true,
+    },
+    firstname: {
+      type: String as PropType<string>,
+      required: true,
+    },
+    lastname: {
+      type: String as PropType<string>,
+      required: true,
+    },
+    amount: {
+      type: Number as PropType<number>,
+      required: true,
+    },
+    reference: {
+      type: String as PropType<string>,
+      required: true,
+    },
+    channels: {
+      type: Array as PropType<string[]>,
+      default: () => ["card", "bank"],
+    },
+    callback: {
+      type: Function as PropType<(response: any) => void>,
+      required: true,
+    },
+    close: {
+      type: Function as PropType<() => void>,
+      required: true,
+    },
+    metadata: {
+      type: Object as PropType<MetaData>,
+      default: () => {},
+    },
+    currency: {
+      type: String as PropType<string>,
+      default: "",
+    },
+    plan: {
+      type: String as PropType<string>,
+      default: "",
+    },
+    quantity: {
+      type: String as PropType<string>,
+      default: "",
+    },
+    subaccount: {
+      type: String as PropType<string>,
+      default: "",
+    },
+    splitCode: {
+      type: String as PropType<string>,
+      default: "",
+    },
+    transactionCharge: {
+      type: Number as PropType<number>,
+      default: 0,
+    },
+    bearer: {
+      type: String as PropType<string>,
+      default: "",
+    },
+  }
+</script>
+```
+
+The properties seen above are needed to utilize Paystack’s Popup JS.
+
+Popup JS provides an easy way to integrate Paystack into our website and start receiving payments:
+
+```typescript
+data() {
+    return {
+      scriptLoaded: false,
+    }
+  },
+  created() {
+    this.loadScript()
+  },
+  methods: {
+    async loadScript(): Promise<void> {
+      const scriptPromise = new Promise<boolean>((resolve) => {
+        const script: any = document.createElement("script")
+        script.defer = true
+        script.src = "https://js.paystack.co/v1/inline.js"
+        // Add script to document head
+        document.getElementsByTagName("head")[0].appendChild(script)
+        if (script.readyState) {
+          // IE support
+          script.onreadystatechange = () => {
+            if (script.readyState === "complete") {
+              script.onreadystatechange = null
+              resolve(true)
+            }
+          }
+        } else {
+          // Others
+          script.onload = () => {
+            resolve(true)
+          }
+        }
+      })
+      this.scriptLoaded = await scriptPromise
+    },
+    payWithPaystack(): void {
+      if (this.scriptLoaded) {
+        const paystackOptions = {
+          key: this.paystackKey,
+          email: this.email,
+          firstname: this.firstname,
+          lastname: this.lastname,
+          channels: this.channels,
+          amount: this.amount,
+          ref: this.reference,
+          callback: (response: any) => {
+            this.callback(response)
+          },
+          onClose: () => {
+            this.close()
+          },
+          metadata: this.metadata,
+          currency: this.currency,
+          plan: this.plan,
+          quantity: this.quantity,
+          subaccount: this.subaccount,
+          split_code: this.splitCode,
+          transaction_charge: this.transactionCharge,
+          bearer: this.bearer,
+        }
+        const windowEl: any = window
+        const handler = windowEl.PaystackPop.setup(paystackOptions)
+        handler.openIframe()
+      }
+    },
+  },
+```
+
+The `scriptLoaded` state helps us to know if the Paystack Popup JS script has been added, and the `loadScript` method loads the Paystack Popup JS script and adds it to our document’s head.
+
+The `payWithPaystack` method is used to initialize a transaction with the Paystack Popup JS when called:
+
+```typescript
+render() {
+    if (isVue2) {
+      return h(
+        "button",
+        {
+          staticClass: ["paystack-button"],
+          style: [{display: "block"}],
+          attrs: {type: "button"},
+          on: {click: this.payWithPaystack},
+        },
+        this.$slots.default ? this.$slots.default : "PROCEED TO PAYMENT"
+      )
+    }
+    return h(
+      "button",
+      {
+        class: ["paystack-button"],
+        style: [{display: "block"}],
+        type: "button",
+        onClick: this.payWithPaystack,
+      },
+      this.$slots.default ? this.$slots.default() : "PROCEED TO PAYMENT"
+    )
+}
+```
+
+The render function helps us create our component without a `<template>` tag, and returns a virtual DOM node.
+
+If you notice, we use one of Vue Demi’s APIs, `isVue2`, in our conditional statement to conditionally render our button. Without this, if we want to use our component library in a Vue 2 application, we may run into errors due to Vue 2 not supporting some of Vue 3’s APIs.
+
+Now when we build our library, it will be accessible in both Vue 2 and Vue 3.
+
+The full source code is available for you [here](https://github.com/ECJ222/vue-paystack2).
+
+## Conclusion
+
+In this article, we took a look at Vue Demi by considering its features, how it works, and how to get started using it.
+
+Vue Demi is a fantastic package with a lot of potential and utility. I would highly recommend using it when creating your next Vue library.
+
+I hope you enjoyed this article!.

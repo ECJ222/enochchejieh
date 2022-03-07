@@ -1,0 +1,283 @@
+---
+slug: "/how-to-build–a-blockchain-from-scratch-in-rust"
+date: "2022-01-02"
+title: "How to build a blockchain from scratch in Rust"
+description: I wrote an article about building a blockchain with Rust.
+---
+
+2021 was a huge year for cryptocurrencies, NFT’s, and decentralized applications (DAPPs), and 2022 will be even bigger. Blockchain is the underlying technology behind all these technologies.
+
+Blockchain technology has the potential to change nearly every aspect of our lives from the Finance industry, Travel & mobility, Infrastructures, Healthcare, Public sector, Retail, Agriculture & mining, Education, Communication, Entertainment, and more.
+
+> Every smart person that I admire in the world has a reason. They understand that this is the driving force of the fourth industrial revolution: steam engine, electricity, then the microchip — blockchain and crypto is the fourth.
+> — Brock Pierce
+
+## What is a blockchain?
+
+A blockchain is a decentralized ledger of transactions across a peer-to-peer network, you can also think of a blockchain like a decentralized database that is immutable. A blockchain can be broken down fundamentally into several components e.g Node, Transaction, Block, Chain, and The consensus protocol (proof of work, proof of stake, proof of history).
+If you are anything like me, you learn by building. Now the reason I’m writing this article is to give you a basic overview of how blockchains work by building a blockchain with Rust.
+Sounds good? Let’s get to it.
+
+## Getting Started
+
+Let us start by creating a new Rust project:
+
+```rust
+cargo +nightly new blockchain
+```
+
+Change to the directory you just created:
+
+```rust
+cd blockchain
+```
+
+Let’s add the necessary packages we need to build a blockchain:
+
+```rust
+[dependencies]
+chrono = "0.4"
+serde = { version = "1.0.106", features = ["derive"] }
+serde_json = "1.0"
+sha2 = "0.10.0"
+```
+
+Next, create folder called models, that’s where you will keep most of your blockchain logic. In that folder create two (2) files called `blockchain.rs` and `block.rs`.
+
+Import the following packages in both of the files and save them:
+
+`Blockchain.rs`
+
+```rust
+use chrono::prelude::*;
+// Internal module
+use super::block::Block;
+```
+
+`Block.rs`
+
+```rust
+use super::blockchain::Blockchain;
+
+use chrono::prelude::*;
+
+use sha2::{Sha256, Digest};
+
+use serde::{Deserialize, Serialize};
+```
+
+If you noticed we imported use `super::block::Block;` in our `blockchain.rs` file, we are just importing the struct located in our `block.rs` file here, don’t worry I will explain that a bit later.
+
+After we have imported the necessary packages let’s create a type in our `blockchain.rs` file called `Blocks`:
+
+```rust
+type Blocks = Vec<Block>;
+```
+
+Next, let’s create a `Blockchain` type in `blockchain.rs` and an empty implementation for our `Blockchain` type:
+
+```rust
+// `Blockchain` A struct that represents the blockchain.
+#[derive(Debug)]
+pub struct Blockchain {
+  // The first block to be added to the chain.
+  pub genesis_block: Block,
+  // The storage for blocks.
+  pub chain: Blocks,
+  // Minimum amount of work required to validate a block.
+  pub difficulty: usize
+}
+impl Blockchain {}
+```
+
+Next, let’s create a Block type in `block.rs` and an empty implementation for our `Block` type:
+
+```rust
+// `Block`, A struct that represents a block in a Blockchain.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Block {
+   // The index in which the current block is stored.
+   pub index: u64,
+   // The time the current block is created.
+   pub timestamp: u64,
+   
+   // The block's proof of work.
+   pub proof_of_work: u64,
+   // The previous block hash.
+   pub previous_hash: String,
+   // The current block hash.
+   pub hash: String
+}
+impl Block {}
+```
+
+## Creating the genesis block:
+
+The genesis block is the first block created in a blockchain. Let’s create a function that creates a genesis block for our blockchain and returns a new instance of the `Blockchain` type.
+
+Add the following code in our `Blockchain` implementation in `blockchain.rs`:
+
+```rust
+impl Blockchain {
+   pub fn new(difficulty: usize) -> Self {
+     // First block in the chain.
+     let mut genesis_block = Block {
+        index: 0,
+        timestamp: Utc::now().timestamp_millis() as u64,
+        proof_of_work: u64::default(),
+        previous_hash: String::default(),
+        hash: String::default()
+     };
+     // Create chain starting from the genesis chain.
+     let mut chain = Vec::new();
+     chain.push(genesis_block.clone());
+     // Create a blockchain Instance.
+     let blockchain = Blockchain {
+        genesis_block,
+        chain,
+        difficulty
+     };
+     blockchain
+   }
+}
+```
+
+In the code above, we did the following:
+
+- Created our genesis_blockinstance.
+- Added the genesis_block we created to the chain in our Blockchain type.
+- Returned an instance of the Blockchain type.
+
+In the `genesis_block` instance we created, notice how we set our previous_hash key to an empty string value (`String::default()`) that’s because there would be no previous block since the genesis block is the first block in the blockchain.
+
+Also notice we made the hash of our `genesis_block` to be an empty string (“”) that’s because we haven’t calculated the hash value for our genesis block yet.
+
+## Generating the hash of a block
+
+A hash is generated with the help of cryptography and current information present in the block.
+Let’s create a function in our block implementation in the `block.rs` file we created called `calculate_hash()`:
+
+```rust
+// Calculate block hash.
+pub fn calculate_hash(&self) -> String {
+  let mut block_data = self.clone();
+  block_data.hash = String::default();
+  let serialized_block_data = serde_json::to_string(&block_data).unwrap();
+  // Calculate and return SHA-256 hash value.
+  let mut hasher = Sha256::new();
+  hasher.update(serialized_block_data);
+  let result = hasher.finalize();
+  format!("{:x}", result)
+}
+```
+
+In the code above, we did the following:
+
+- Converted the block’s data to JSON format.
+- Hashed the block’s data with the SHA256 algorithm.
+- Returned the hashing result in base16.
+
+## Creating a new block
+
+Great!, we have implemented functionalities for creating our genesis block and calculating the block hashes of our blocks.
+Now let’s add the functionality for adding new blocks to the blockchain, in our blockchain.rs file add this function to the `Blockchain` type implementation:
+
+```rust
+pub fn add_block(&mut self, nonce: String) {
+  let new_block = Block::new(
+    self.chain.len() as u64,
+    nonce,
+    self.chain[&self.chain.len() - 1].previous_hash.clone()
+  );
+  new_block.mine(self.clone());
+  self.chain.push(new_block.clone());
+  println!("New block added to chain -> {:?}", new_block);
+}
+```
+
+Here we did the following:
+
+- Created an `add_block` function that takes in an argument called &mut self (instance of the `Blockchain` type).
+- Created our instance of the `Block` type.
+- Mined a block hash using the `Block` type’s mine function.
+- Added the new block to the chain of blocks.
+
+Next in our `block.rs` file add the following code in the `Block` type implementation:
+
+```rust
+// Create a new block. The hash will be calculated and set automatically.
+pub fn new (
+ index: u64,
+ previous_hash: String,
+) -> Self {
+   // Current block to be created.
+   let mut block = Block {
+      index: 0,
+      timestamp: Utc::now().timestamp_millis() as u64,
+      proof_of_work: u64::default(),
+      previous_hash: String::default(),
+      hash: String::default(),
+   };
+   block
+}
+```
+
+Here we did the following:
+
+Created a function called `new()` that takes in three arguments index and previous_hash.
+Created our instance of the `Block` type.
+Generated a block hash for our block.
+Returned an instance of the `Block` type.
+
+## Mining new block
+We have successfully implemented functionality for creating a new block.
+
+Let’s implement functionality for mining new blocks. The process of mining new blocks involves generating a SHA256 hash that starts with a desired number of 0s which would be the mining difficulty miners have to solve to mine a new block.
+
+Let’s create a function in our `block.rs` file inside our `Block` type implementation:
+
+```rust
+// Mine block hash.
+pub fn mine (&mut self, blockchain: Blockchain) {
+  loop {
+    if !self.hash.starts_with(&"0".repeat(blockchain.difficulty)) {
+      self.proof_of_work += 1;
+      self.hash = self.generate_block_hash();
+    } else {
+       break
+    }
+  }
+}
+```
+
+Great job, we are done with implementing our blockchain, now let’s test it out.
+
+Let’s create a file called `mod.rs` in our models folder and save the following code:
+
+```rust
+pub mod block;
+
+pub mod blockchain;
+```
+
+All we are doing here is making the files we created earlier `blockchain.rs` and `block.rs` publicly accessible in our `main.rs` file.
+
+Now let’s paste the following code in our `main.rs` file:
+
+```rust
+mod models;
+
+fn main() {
+   let difficulty = 1;
+   let mut blockchain = models::blockchain::Blockchain::new(difficulty);
+   models::blockchain::Blockchain::add_block(&mut blockchain);
+}
+```
+
+Now to initiate a transaction run `cargo +nightly run` in your terminal.
+
+## Conclusion
+In this tutorial you’ve learned how to create a simple blockchain from scratch with Rust.
+
+I hope you’ve enjoyed reading this article, you can get the full source code of this Rust blockchain [here](https://github.com/ECJ222/Rust-blockchain)
+
